@@ -107,10 +107,10 @@ test_end_line(do) ->
 
 %% Test help funs
 
-process_tests(Tests) ->
-  lists:foreach(fun ({Fun, FunTests}) ->
-                    process_tests(Fun, FunTests)
-                end, Tests).
+%process_tests(Tests) ->
+%  lists:foreach(fun ({Fun, FunTests}) ->
+%                    process_tests(Fun, FunTests)
+%                end, Tests).
 
 process_tests(Fun, Tests) ->
   process_tests(Fun, Tests, 1).
@@ -119,12 +119,12 @@ process_tests(Fun, Tests) ->
 %% Msg        - test purpose
 %% Args       - [Arg]
 %% TrueResult - true result pattern
-process_tests(Fun, [], _) ->
+process_tests(_Fun, [], _) ->
   ok;
 process_tests(Fun, [Test|Tail], Num) ->
   {Msg, Args, ResPat} = Test,
   Status = case catch apply(Fun,Args) of
-             Res when function(ResPat) ->
+             Res when is_function(ResPat) ->
                case catch ResPat(Res) of
                  ok ->
                    [passed, ok];
