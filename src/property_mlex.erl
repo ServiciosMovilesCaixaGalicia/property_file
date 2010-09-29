@@ -193,12 +193,12 @@ punct() ->
 %%
 %% Format funs
 %%
-yeec_token_apache(Class=atom_string, Line, Str="Include") ->
+yeec_token_apache(_Class=atom_string, Line, _Str="Include") ->
   {operator, Line, "INCLUDE"};
 yeec_token_apache(Class, Line, Str) ->
   yeec_token(Class, Line, Str).
 
-yeec_token_clike(Class=operator, Line, Str) ->
+yeec_token_clike(_Class=operator, Line, Str) ->
   {operator, Line, unquote_chars(tl(Str))};
 yeec_token_clike(Class, Line, Str) ->
   yeec_token(Class, Line, Str).
@@ -222,23 +222,23 @@ yeec_token(Class=integer_num, Line, Str) ->
   {Class, Line, list_to_integer(Str)};
 yeec_token(Class=float_num, Line, Str) ->
   {Class, Line, list_to_float(Str)};
-yeec_token(Class=true_kw, Line, _) ->
+yeec_token(_Class=true_kw, Line, _) ->
   {bool, Line, true};
 yeec_token(false_kw, Line, _) ->
   {bool, Line, false};
-yeec_token(Class=atom_string, Line, Str) ->
+yeec_token(_Class=atom_string, Line, Str) ->
   {atom_string, Line, unquote_chars(Str)};
-yeec_token(Class=dquote_string, Line, Str) ->
+yeec_token(_Class=dquote_string, Line, Str) ->
   {string, Line, unquote_chars(string:strip(Str, both, $"))};
-yeec_token(Class=squote_string, Line, Str) ->
+yeec_token(_Class=squote_string, Line, Str) ->
   {atom_string, Line, unquote_chars(string:strip(Str, both, $'))};
-yeec_token(Class=unquote_string, Line, Str) ->
+yeec_token(_Class=unquote_string, Line, Str) ->
   {string, Line, unquote_chars(Str)};
-yeec_token(Class=unquote_substring1, Line, Str) ->
+yeec_token(_Class=unquote_substring1, Line, Str) ->
   env_set(substr, unquote),
   {substring, Line, unquote_chars(Str)};
 
-yeec_token(Class=unquote_substring3, Line, Str) ->
+yeec_token(_Class=unquote_substring3, Line, Str) ->
   case env_get(substr) of
     StrType when StrType == unquote;
 		 StrType == undefined ->
@@ -248,12 +248,12 @@ yeec_token(Class=unquote_substring3, Line, Str) ->
     dquote ->
       {substring, Line, unquote_chars(tl(Str))}
   end;
-yeec_token(Class=unquote_substring2, Line, Str) ->
+yeec_token(_Class=unquote_substring2, Line, Str) ->
   {substring, Line, unquote_chars(tl(Str))};
-yeec_token(Class=dquote_substring1, Line, Str) ->
+yeec_token(_Class=dquote_substring1, Line, Str) ->
   env_set(substr, dquote),
   {substring, Line, unquote_chars(string:strip(Str, left, $"))};
-yeec_token(Class=dquote_substring2, Line, Str) ->
+yeec_token(_Class=dquote_substring2, Line, Str) ->
   {substring, Line, unquote_chars(tl(string:strip(Str, right, $")))};
 yeec_token(Class, Line, Data) ->
   {Class, Line, Data}.
@@ -317,16 +317,16 @@ parse_ipv4_netmask(Str) ->
     end of
     {ok, Result} ->
       Result;
-    Error ->
+    _Error ->
       {error, {bad_netmask, Str}}
   end.
 
 ipv4_to_netmask({A4, A3, A2, A1}) ->
   {ok, (A4 bsl 24) + (A3 bsl 16) + (A2 bsl 8) + A1}.
 
-int_to_ipv4_netmask(StrMask) when list(StrMask) ->
+int_to_ipv4_netmask(StrMask) when is_list(StrMask) ->
   int_to_ipv4_netmask(list_to_integer(StrMask));
-int_to_ipv4_netmask(Num) when integer(Num),
+int_to_ipv4_netmask(Num) when is_integer(Num),
 			      Num =< 32,
 			      Num >= 0 ->
   {ok, (16#ffffffff bsl (32-Num)) band 16#ffffffff}.
@@ -334,7 +334,7 @@ int_to_ipv4_netmask(Num) when integer(Num),
 split_string(Str, Delims) ->
   split_string(Str, Delims, [[]]).
 
-split_string([], Delims, SubStrs) ->
+split_string([], _Delims, SubStrs) ->
   lists:reverse([lists:reverse(S) || S <- SubStrs]);
 split_string([$\\, C|Str], Delims, [S|Ss]) ->
   split_string(Str, Delims, [[C, $\\| S]|Ss]);
@@ -379,7 +379,7 @@ env_create(Parent) ->
 
 env_loop({Parent, Dict}) ->
   receive
-    {set, Pid, {Name, Val}} ->
+    {set, _Pid, {Name, Val}} ->
       Dict1 = dict:store(Name, Val, Dict),
       env_loop({Parent, Dict1});
     {get, Pid, Name} ->

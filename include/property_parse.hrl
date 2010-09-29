@@ -105,19 +105,19 @@ yecctoken2string({char,_,C}) -> io_lib:write_char(C);
 yecctoken2string({var,_,V}) -> io_lib:format('~s', [V]);
 yecctoken2string({string,_,S}) -> io_lib:write_string(S);
 yecctoken2string({reserved_symbol, _, A}) -> io_lib:format('~w', [A]);
-yecctoken2string({Cat, _, Val}) -> io_lib:format('~w', [Val]);
+yecctoken2string({_Cat, _, Val}) -> io_lib:format('~w', [Val]);
 
 yecctoken2string({'dot', _}) -> io_lib:format('~w', ['.']);
 yecctoken2string({'$end', _}) ->
     [];
-yecctoken2string({Other, _}) when atom(Other) ->
+yecctoken2string({Other, _}) when is_atom(Other) ->
     io_lib:format('~w', [Other]);
 yecctoken2string(Other) ->
     io_lib:write(Other).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-add_simple(Name, Value) when list(Value) ->
+add_simple(Name, Value) when is_list(Value) ->
   VarName = list_to_atom(Name),
   var_add(VarName, Value),
   {VarName, [Value]};
@@ -149,7 +149,7 @@ add_value([], List) ->
 add_value(Val, List) ->
   [Val|List].
 
-value_of(Token) when tuple(Token) ->
+value_of(Token) when is_tuple(Token) ->
   element(3, Token);
 value_of(Token) ->
    return_error(0, io_lib:format("Bad token ~p", [Token])).
@@ -226,7 +226,7 @@ stack_new_frame() ->
   gb_trees:empty().
 
 stack_new_frame(Top) ->
-  NF = gb_trees:empty(),
+  _NF = gb_trees:empty(),
   gb_trees:from_orddict(gb_trees:to_list(Top)).
 
 %% Scanner
@@ -264,7 +264,7 @@ tokenizer_add(FileName, Line, State={Fun, _, _}) ->
   Fun({add, FileName, Line}, State).
 
 scan_file(FileName, {GrammarMod, Grammar}) ->
-  Buf = file_to_buf(FileName),
+  _Buf = file_to_buf(FileName),
   AddFName =
     fun ({C, L, V}) -> {C, {FileName, L}, V};
 	({C, L}) -> {C, {FileName, L}}
@@ -290,7 +290,7 @@ file_to_buf(FileName) ->
       throw(Error)
   end.
 
-string_to_buf(Bin) when binary(Bin) ->
+string_to_buf(Bin) when is_binary(Bin) ->
   string_to_buf(binary_to_list(Bin));
 string_to_buf(Str) ->
   property_str_buf:str_to_buf(Str).
