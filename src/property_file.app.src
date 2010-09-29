@@ -1,0 +1,11 @@
+{application, property_file,
+ [
+  {description, "Property File"},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {env, []}
+ ]}.

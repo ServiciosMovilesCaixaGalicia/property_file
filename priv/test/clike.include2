@@ -1,0 +1,8 @@
+thread2 pool2 {
+	start_servers = 5
+	max_servers = 32
+	min_spare_servers = 3
+	max_spare_servers = 10
+	max_requests_per_server = 0
+}
+
